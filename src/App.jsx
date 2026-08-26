@@ -59,12 +59,12 @@ export default function App() {
       return undefined;
     }
 
-    const timer = window.setInterval(() => {
+    const timer = window.setTimeout(() => {
       runAction('advance', '/api/demo/step');
     }, AUTO_PLAY_INTERVAL_MS);
 
-    return () => window.clearInterval(timer);
-  }, [autoPlay, runAction, snapshot?.completed]);
+    return () => window.clearTimeout(timer);
+  }, [autoPlay, runAction, snapshot]);
 
   const latestEvents = useMemo(() => snapshot?.events.slice().reverse() ?? [], [snapshot]);
   const currentStageLabel = snapshot?.currentStage?.label ?? 'Loading';

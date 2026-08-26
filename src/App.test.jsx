@@ -81,16 +81,15 @@ describe('App', () => {
     render(<App />);
     await screen.findByText('Simulation ready');
 
-    const intervalSpy = vi.spyOn(window, 'setInterval').mockImplementation((callback) => {
-      callback();
-      return 1;
+    const originalSetTimeout = window.setTimeout;
+    const timeoutSpy = vi.spyOn(window, 'setTimeout').mockImplementation((callback, delay, ...args) => {
+      return originalSetTimeout(callback, delay === 900 ? 0 : delay, ...args);
     });
-    vi.spyOn(window, 'clearInterval').mockImplementation(() => {});
 
     fireEvent.click(screen.getByRole('button', { name: 'Auto Play' }));
     expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument();
 
-    await waitFor(() => expect(intervalSpy).toHaveBeenCalled());
+    await waitFor(() => expect(timeoutSpy).toHaveBeenCalled());
     expect(await screen.findByText('Lifecycle completes with a stable snapshot')).toBeInTheDocument();
     expect(screen.getAllByText('Complete').length).toBeGreaterThan(0);
     expect(screen.getByRole('button', { name: 'Auto Play' })).toBeDisabled();
